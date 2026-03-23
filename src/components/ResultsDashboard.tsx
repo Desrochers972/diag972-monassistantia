@@ -10,6 +10,8 @@ const iconMap: Record<string, React.ElementType> = {
 interface ResultsDashboardProps {
   answers: Answer[];
   finalAnswer: string;
+  userEmail: string;
+  companyName: string;
   onRestart: () => void;
 }
 
