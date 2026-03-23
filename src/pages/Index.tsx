@@ -17,6 +17,8 @@ const Index = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [finalAnswer, setFinalAnswer] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [companyName, setCompanyName] = useState('');
 
   const currentQ = allQuestions[currentIndex];
   const category = useMemo(
