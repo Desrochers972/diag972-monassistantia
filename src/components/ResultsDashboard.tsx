@@ -10,6 +10,8 @@ const iconMap: Record<string, React.ElementType> = {
 interface ResultsDashboardProps {
   answers: Answer[];
   finalAnswer: string;
+  userEmail: string;
+  companyName: string;
   onRestart: () => void;
 }
 
@@ -25,7 +27,7 @@ const getScoreLabel = (score: number) => {
   return 'Maîtrisé';
 };
 
-const ResultsDashboard = ({ answers, finalAnswer, onRestart }: ResultsDashboardProps) => {
+const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRestart }: ResultsDashboardProps) => {
   const categoryScores = useMemo(() => {
     return categories.map((cat) => {
       const catAnswers = answers.filter((a) =>
@@ -61,9 +63,12 @@ const ResultsDashboard = ({ answers, finalAnswer, onRestart }: ResultsDashboardP
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-3xl md:text-5xl font-heading font-bold mb-4">
+          <h1 className="text-3xl md:text-5xl font-heading font-bold mb-2">
             Résultats du diagnostic
           </h1>
+          {companyName && (
+            <p className="text-lg text-primary font-medium mb-4">{companyName}</p>
+          )}
           <p className="text-muted-foreground text-lg">
             Score global :{' '}
             <span className="font-bold text-2xl" style={{ color: getScoreColor(globalAvg) }}>

@@ -1,11 +1,12 @@
 import { useState, useCallback, useMemo } from 'react';
 import WelcomeScreen from '@/components/WelcomeScreen';
+import UserInfoScreen from '@/components/UserInfoScreen';
 import QuestionCard from '@/components/QuestionCard';
 import FinalQuestion from '@/components/FinalQuestion';
 import ResultsDashboard from '@/components/ResultsDashboard';
 import { categories, type Answer } from '@/data/questions';
 
-type Phase = 'welcome' | 'questions' | 'final' | 'results';
+type Phase = 'welcome' | 'userinfo' | 'questions' | 'final' | 'results';
 
 const allQuestions = categories.flatMap((cat) =>
   cat.questions.map((q) => ({ ...q, categoryId: cat.id, categoryName: cat.name, categoryEmoji: cat.emoji }))
@@ -16,6 +17,8 @@ const Index = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [finalAnswer, setFinalAnswer] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [companyName, setCompanyName] = useState('');
 
   const currentQ = allQuestions[currentIndex];
   const category = useMemo(
@@ -58,9 +61,27 @@ const Index = () => {
     setCurrentIndex(0);
     setAnswers([]);
     setFinalAnswer('');
+    setUserEmail('');
+    setCompanyName('');
   }, []);
 
-  if (phase === 'welcome') return <WelcomeScreen onStart={() => setPhase('questions')} />;
+  const handleUserInfo = useCallback((email: string, company: string) => {
+    setUserEmail(email);
+    setCompanyName(company);
+    setPhase('questions');
+  }, []);
+
+  if (phase === 'welcome') return <WelcomeScreen onStart={() => setPhase('userinfo')} />;
+
+  if (phase === 'userinfo') {
+    return (
+      <UserInfoScreen
+        onContinue={handleUserInfo}
+        existingEmail={userEmail}
+        existingCompanyName={companyName}
+      />
+    );
+  }
 
   if (phase === 'questions' && currentQ && category) {
     return (
@@ -94,6 +115,8 @@ const Index = () => {
     <ResultsDashboard
       answers={answers}
       finalAnswer={finalAnswer}
+      userEmail={userEmail}
+      companyName={companyName}
       onRestart={handleRestart}
     />
   );
