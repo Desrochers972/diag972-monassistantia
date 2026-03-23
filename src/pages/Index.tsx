@@ -61,9 +61,27 @@ const Index = () => {
     setCurrentIndex(0);
     setAnswers([]);
     setFinalAnswer('');
+    setUserEmail('');
+    setCompanyName('');
   }, []);
 
-  if (phase === 'welcome') return <WelcomeScreen onStart={() => setPhase('questions')} />;
+  const handleUserInfo = useCallback((email: string, company: string) => {
+    setUserEmail(email);
+    setCompanyName(company);
+    setPhase('questions');
+  }, []);
+
+  if (phase === 'welcome') return <WelcomeScreen onStart={() => setPhase('userinfo')} />;
+
+  if (phase === 'userinfo') {
+    return (
+      <UserInfoScreen
+        onContinue={handleUserInfo}
+        existingEmail={userEmail}
+        existingCompanyName={companyName}
+      />
+    );
+  }
 
   if (phase === 'questions' && currentQ && category) {
     return (
