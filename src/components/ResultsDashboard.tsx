@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
 import { Target, Briefcase, ShieldAlert, Landmark, Megaphone, Globe, FolderOpen, Leaf, AlertTriangle, Download, Calendar } from 'lucide-react';
 import { categories, type Answer } from '@/data/questions';
+import { supabase } from '@/integrations/supabase/client';
 
 const iconMap: Record<string, React.ElementType> = {
   Target, Briefcase, ShieldAlert, Landmark, Megaphone, Globe, FolderOpen, Leaf,
