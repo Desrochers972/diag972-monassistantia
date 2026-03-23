@@ -1,11 +1,12 @@
 import { useState, useCallback, useMemo } from 'react';
 import WelcomeScreen from '@/components/WelcomeScreen';
+import UserInfoScreen from '@/components/UserInfoScreen';
 import QuestionCard from '@/components/QuestionCard';
 import FinalQuestion from '@/components/FinalQuestion';
 import ResultsDashboard from '@/components/ResultsDashboard';
 import { categories, type Answer } from '@/data/questions';
 
-type Phase = 'welcome' | 'questions' | 'final' | 'results';
+type Phase = 'welcome' | 'userinfo' | 'questions' | 'final' | 'results';
 
 const allQuestions = categories.flatMap((cat) =>
   cat.questions.map((q) => ({ ...q, categoryId: cat.id, categoryName: cat.name, categoryEmoji: cat.emoji }))
