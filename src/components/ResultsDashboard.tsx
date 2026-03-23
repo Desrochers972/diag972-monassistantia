@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
 import { Target, Briefcase, ShieldAlert, Landmark, Megaphone, Globe, FolderOpen, Leaf, AlertTriangle, Download, Calendar } from 'lucide-react';
 import { categories, type Answer } from '@/data/questions';
+import { supabase } from '@/integrations/supabase/client';
 
 const iconMap: Record<string, React.ElementType> = {
   Target, Briefcase, ShieldAlert, Landmark, Megaphone, Globe, FolderOpen, Leaf,
@@ -51,6 +52,32 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
 
   const urgentZones = categoryScores.filter((c) => c.score < 4);
   const globalAvg = categoryScores.reduce((s, c) => s + c.score, 0) / categoryScores.length;
+
+  // Save diagnostic to database on mount
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (savedRef.current) return;
+    savedRef.current = true;
+
+    const saveDiagnostic = async () => {
+      const scoresSummary = categoryScores.map((c) => ({
+        category: c.category,
+        categoryId: c.categoryId,
+        score: c.score,
+      }));
+
+      await supabase.from('diagnostics').insert({
+        user_email: userEmail || null,
+        company_name: companyName || null,
+        answers: answers as any,
+        final_answer: finalAnswer || null,
+        category_scores: scoresSummary as any,
+        global_score: Math.round(globalAvg * 10) / 10,
+      });
+    };
+
+    saveDiagnostic();
+  }, []);
 
   const radarData = categoryScores.map((c) => ({
     subject: c.emoji + ' ' + c.category,
