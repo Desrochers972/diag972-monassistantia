@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      diagnostics: {
+        Row: {
+          answers: Json
+          category_scores: Json
+          company_name: string | null
+          created_at: string
+          final_answer: string | null
+          global_score: number
+          id: string
+          user_email: string | null
+        }
+        Insert: {
+          answers: Json
+          category_scores: Json
+          company_name?: string | null
+          created_at?: string
+          final_answer?: string | null
+          global_score: number
+          id?: string
+          user_email?: string | null
+        }
+        Update: {
+          answers?: Json
+          category_scores?: Json
+          company_name?: string | null
+          created_at?: string
+          final_answer?: string | null
+          global_score?: number
+          id?: string
+          user_email?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
