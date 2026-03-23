@@ -115,6 +115,8 @@ const Index = () => {
     <ResultsDashboard
       answers={answers}
       finalAnswer={finalAnswer}
+      userEmail={userEmail}
+      companyName={companyName}
       onRestart={handleRestart}
     />
   );

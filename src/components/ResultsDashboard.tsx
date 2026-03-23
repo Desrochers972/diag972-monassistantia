@@ -27,7 +27,7 @@ const getScoreLabel = (score: number) => {
   return 'Maîtrisé';
 };
 
-const ResultsDashboard = ({ answers, finalAnswer, onRestart }: ResultsDashboardProps) => {
+const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRestart }: ResultsDashboardProps) => {
   const categoryScores = useMemo(() => {
     return categories.map((cat) => {
       const catAnswers = answers.filter((a) =>
