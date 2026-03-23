@@ -1,8 +1,15 @@
-import { Target, Briefcase, ShieldAlert, Landmark, Megaphone, Globe, FolderOpen, Leaf, ArrowRight } from 'lucide-react';
-import { categories } from '@/data/questions';
+import { Target, Briefcase, ShieldAlert, Landmark, Megaphone, Globe, FolderOpen, Leaf, ArrowRight } from "lucide-react";
+import { categories } from "@/data/questions";
 
 const iconMap: Record<string, React.ElementType> = {
-  Target, Briefcase, ShieldAlert, Landmark, Megaphone, Globe, FolderOpen, Leaf,
+  Target,
+  Briefcase,
+  ShieldAlert,
+  Landmark,
+  Megaphone,
+  Globe,
+  FolderOpen,
+  Leaf,
 };
 
 interface WelcomeScreenProps {
@@ -11,7 +18,10 @@ interface WelcomeScreenProps {
 
 const WelcomeScreen = ({ onStart }: WelcomeScreenProps) => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12" style={{ background: 'var(--gradient-hero)' }}>
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
+      style={{ background: "var(--gradient-hero)" }}
+    >
       <div className="max-w-3xl w-full text-center animate-fade-in">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-8">
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -19,7 +29,7 @@ const WelcomeScreen = ({ onStart }: WelcomeScreenProps) => {
         </div>
 
         <h1 className="text-4xl md:text-6xl font-heading font-bold mb-6 leading-tight">
-          Identifiez vos <span className="gradient-primary bg-clip-text text-transparent">zones de risques</span> et d'opportunités
+          Identifiez vos zones de risques et d'opportunités
         </h1>
 
         <p className="text-lg text-muted-foreground mb-12 max-w-xl mx-auto leading-relaxed">
@@ -30,7 +40,10 @@ const WelcomeScreen = ({ onStart }: WelcomeScreenProps) => {
           {categories.map((cat) => {
             const Icon = iconMap[cat.icon];
             return (
-              <div key={cat.id} className="glass-card p-4 flex flex-col items-center gap-2 hover:border-primary/40 transition-colors">
+              <div
+                key={cat.id}
+                className="glass-card p-4 flex flex-col items-center gap-2 hover:border-primary/40 transition-colors"
+              >
                 <Icon className="w-5 h-5 text-primary" />
                 <span className="text-xs font-medium text-foreground/80">{cat.name}</span>
                 <span className="text-[10px] text-muted-foreground">{cat.questions.length} questions</span>
