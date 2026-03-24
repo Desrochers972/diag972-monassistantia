@@ -1,0 +1,1 @@
+CREATE POLICY "Anyone can update diagnostics" ON public.diagnostics FOR UPDATE TO anon USING (true) WITH CHECK (true);
