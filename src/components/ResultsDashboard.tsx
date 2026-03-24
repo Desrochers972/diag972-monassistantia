@@ -70,18 +70,30 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
         score: c.score,
       }));
 
-      await supabase.from('diagnostics').insert({
+      const { data } = await supabase.from('diagnostics').insert({
         user_email: userEmail || null,
         company_name: companyName || null,
         answers: answers as any,
         final_answer: finalAnswer || null,
         category_scores: scoresSummary as any,
         global_score: Math.round(globalAvg * 10) / 10,
-      });
+        wants_consultant_rdv: false,
+      } as any).select('id').single();
+
+      if (data) diagnosticIdRef.current = (data as any).id;
     };
 
     saveDiagnostic();
   }, []);
+
+  const handleRdvChange = async (checked: boolean) => {
+    setWantsRdv(checked);
+    if (diagnosticIdRef.current) {
+      await supabase.from('diagnostics')
+        .update({ wants_consultant_rdv: checked } as any)
+        .eq('id', diagnosticIdRef.current);
+    }
+  };
 
   const radarData = categoryScores.map((c) => ({
     subject: c.emoji + ' ' + c.category,
