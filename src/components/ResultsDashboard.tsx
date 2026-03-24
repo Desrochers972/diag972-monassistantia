@@ -30,6 +30,9 @@ const getScoreLabel = (score: number) => {
 };
 
 const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRestart }: ResultsDashboardProps) => {
+  const [wantsRdv, setWantsRdv] = useState(false);
+  const diagnosticIdRef = useRef<string | null>(null);
+
   const categoryScores = useMemo(() => {
     return categories.map((cat) => {
       const catAnswers = answers.filter((a) =>
