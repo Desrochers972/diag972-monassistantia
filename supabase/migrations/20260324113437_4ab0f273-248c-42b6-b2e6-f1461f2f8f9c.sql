@@ -1,0 +1,1 @@
+ALTER TABLE public.diagnostics ADD COLUMN wants_consultant_rdv boolean NOT NULL DEFAULT false;

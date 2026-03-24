@@ -1,6 +1,7 @@
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
-import { Target, Briefcase, ShieldAlert, Landmark, Megaphone, Globe, FolderOpen, Leaf, AlertTriangle, Download, Calendar } from 'lucide-react';
+import { Target, Briefcase, ShieldAlert, Landmark, Megaphone, Globe, FolderOpen, Leaf, AlertTriangle } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { categories, type Answer } from '@/data/questions';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -29,6 +30,9 @@ const getScoreLabel = (score: number) => {
 };
 
 const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRestart }: ResultsDashboardProps) => {
+  const [wantsRdv, setWantsRdv] = useState(false);
+  const diagnosticIdRef = useRef<string | null>(null);
+
   const categoryScores = useMemo(() => {
     return categories.map((cat) => {
       const catAnswers = answers.filter((a) =>
@@ -66,18 +70,30 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
         score: c.score,
       }));
 
-      await supabase.from('diagnostics').insert({
+      const { data } = await supabase.from('diagnostics').insert({
         user_email: userEmail || null,
         company_name: companyName || null,
         answers: answers as any,
         final_answer: finalAnswer || null,
         category_scores: scoresSummary as any,
         global_score: Math.round(globalAvg * 10) / 10,
-      });
+        wants_consultant_rdv: false,
+      } as any).select('id').single();
+
+      if (data) diagnosticIdRef.current = (data as any).id;
     };
 
     saveDiagnostic();
   }, []);
+
+  const handleRdvChange = async (checked: boolean) => {
+    setWantsRdv(checked);
+    if (diagnosticIdRef.current) {
+      await supabase.from('diagnostics')
+        .update({ wants_consultant_rdv: checked } as any)
+        .eq('id', diagnosticIdRef.current);
+    }
+  };
 
   const radarData = categoryScores.map((c) => ({
     subject: c.emoji + ' ' + c.category,
@@ -224,21 +240,19 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in">
-          <button
-            onClick={() => window.print()}
-            className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-secondary text-secondary-foreground font-semibold hover:bg-secondary/80 transition-colors"
-          >
-            <Download className="w-5 h-5" />
-            Exporter en PDF
-          </button>
-          <button
-            className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl gradient-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-primary/25"
-          >
-            <Calendar className="w-5 h-5" />
-            Prendre RDV avec un consultant
-          </button>
+        {/* Consultant RDV checkbox */}
+        <div className="glass-card p-6 animate-fade-in">
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="consultant-rdv"
+              checked={wantsRdv}
+              onCheckedChange={(checked) => handleRdvChange(checked === true)}
+              className="mt-1"
+            />
+            <label htmlFor="consultant-rdv" className="text-sm text-foreground/90 leading-relaxed cursor-pointer">
+              Souhaitez-vous un rdv avec un de nos Consultants pour avoir un diagnostic approfondi et une présentation de notre logiciel MonAssistant IA ?
+            </label>
+          </div>
         </div>
 
         <div className="text-center mt-8">

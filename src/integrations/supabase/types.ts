@@ -24,6 +24,7 @@ export type Database = {
           global_score: number
           id: string
           user_email: string | null
+          wants_consultant_rdv: boolean
         }
         Insert: {
           answers: Json
@@ -34,6 +35,7 @@ export type Database = {
           global_score: number
           id?: string
           user_email?: string | null
+          wants_consultant_rdv?: boolean
         }
         Update: {
           answers?: Json
@@ -44,6 +46,7 @@ export type Database = {
           global_score?: number
           id?: string
           user_email?: string | null
+          wants_consultant_rdv?: boolean
         }
         Relationships: []
       }
