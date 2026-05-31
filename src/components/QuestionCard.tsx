@@ -75,8 +75,11 @@ const QuestionCard = ({
         />
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="max-w-2xl w-full animate-fade-in">
+      <div className="flex-1 flex flex-col items-center px-4 py-8">
+        <p className="max-w-2xl w-full text-center font-bold italic text-yellow-400 mb-6">
+          Pour chaque question répondez avec vos propres mots et donnez une évaluation sur 10 de la situation de votre entreprise par rapport à la question.
+        </p>
+        <div className="max-w-2xl w-full animate-fade-in flex-1 flex flex-col justify-center">
           {/* Category badge */}
           <div className="flex items-center justify-between mb-8">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary border border-border">
