@@ -64,10 +64,14 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
   const [wantsRdv, setWantsRdv] = useState(false);
   const diagnosticIdRef = useRef<string | null>(null);
 
-  const categoryScores = useMemo(() => {
+  const allCategoryScores = useMemo(() => {
     return categories.map((cat) => {
       const catAnswers = answers.filter((a) => cat.questions.some((q) => q.id === a.questionId));
-      const avg = catAnswers.length > 0 ? catAnswers.reduce((sum, a) => sum + a.score, 0) / catAnswers.length : 0;
+      const relevantAnswers = catAnswers.filter((a) => a.score > 0);
+      const isNotApplicable = catAnswers.length > 0 && relevantAnswers.length === 0;
+      const avg = relevantAnswers.length > 0
+        ? relevantAnswers.reduce((sum, a) => sum + a.score, 0) / relevantAnswers.length
+        : 0;
       return {
         category: cat.name,
         categoryId: cat.id,
@@ -77,12 +81,21 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
         fullMark: 10,
         answers: catAnswers,
         questions: cat.questions,
+        isNotApplicable,
       };
     });
   }, [answers]);
 
+  const categoryScores = useMemo(
+    () => allCategoryScores.filter((c) => !c.isNotApplicable),
+    [allCategoryScores]
+  );
+
   const urgentZones = categoryScores.filter((c) => c.score < 4);
-  const globalAvg = categoryScores.reduce((s, c) => s + c.score, 0) / categoryScores.length;
+  const globalAvg = categoryScores.length > 0
+    ? categoryScores.reduce((s, c) => s + c.score, 0) / categoryScores.length
+    : 0;
+
 
   // Save diagnostic to database on mount
   const savedRef = useRef(false);
