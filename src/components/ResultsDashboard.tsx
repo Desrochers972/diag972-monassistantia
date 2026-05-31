@@ -1,12 +1,43 @@
-import { useMemo, useEffect, useRef, useState } from 'react';
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
-import { Target, Briefcase, ShieldAlert, Landmark, Megaphone, Globe, FolderOpen, Leaf, AlertTriangle } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
-import { categories, type Answer } from '@/data/questions';
-import { supabase } from '@/integrations/supabase/client';
+import { useMemo, useEffect, useRef, useState } from "react";
+import {
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Cell,
+} from "recharts";
+import {
+  Target,
+  Briefcase,
+  ShieldAlert,
+  Landmark,
+  Megaphone,
+  Globe,
+  FolderOpen,
+  Leaf,
+  AlertTriangle,
+} from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { categories, type Answer } from "@/data/questions";
+import { supabase } from "@/integrations/supabase/client";
 
 const iconMap: Record<string, React.ElementType> = {
-  Target, Briefcase, ShieldAlert, Landmark, Megaphone, Globe, FolderOpen, Leaf,
+  Target,
+  Briefcase,
+  ShieldAlert,
+  Landmark,
+  Megaphone,
+  Globe,
+  FolderOpen,
+  Leaf,
 };
 
 interface ResultsDashboardProps {
@@ -18,15 +49,15 @@ interface ResultsDashboardProps {
 }
 
 const getScoreColor = (score: number) => {
-  if (score < 4) return '#ef4444';
-  if (score <= 7) return '#f59e0b';
-  return '#22c55e';
+  if (score < 4) return "#ef4444";
+  if (score <= 7) return "#f59e0b";
+  return "#22c55e";
 };
 
 const getScoreLabel = (score: number) => {
-  if (score < 4) return 'Zone d\'urgence';
-  if (score <= 7) return 'À améliorer';
-  return 'Maîtrisé';
+  if (score < 4) return "Zone d'urgence";
+  if (score <= 7) return "À améliorer";
+  return "Maîtrisé";
 };
 
 const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRestart }: ResultsDashboardProps) => {
@@ -35,12 +66,8 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
 
   const categoryScores = useMemo(() => {
     return categories.map((cat) => {
-      const catAnswers = answers.filter((a) =>
-        cat.questions.some((q) => q.id === a.questionId)
-      );
-      const avg = catAnswers.length > 0
-        ? catAnswers.reduce((sum, a) => sum + a.score, 0) / catAnswers.length
-        : 0;
+      const catAnswers = answers.filter((a) => cat.questions.some((q) => q.id === a.questionId));
+      const avg = catAnswers.length > 0 ? catAnswers.reduce((sum, a) => sum + a.score, 0) / catAnswers.length : 0;
       return {
         category: cat.name,
         categoryId: cat.id,
@@ -70,15 +97,19 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
         score: c.score,
       }));
 
-      const { data } = await supabase.from('diagnostics').insert({
-        user_email: userEmail || null,
-        company_name: companyName || null,
-        answers: answers as any,
-        final_answer: finalAnswer || null,
-        category_scores: scoresSummary as any,
-        global_score: Math.round(globalAvg * 10) / 10,
-        wants_consultant_rdv: false,
-      } as any).select('id').single();
+      const { data } = await supabase
+        .from("diagnostics")
+        .insert({
+          user_email: userEmail || null,
+          company_name: companyName || null,
+          answers: answers as any,
+          final_answer: finalAnswer || null,
+          category_scores: scoresSummary as any,
+          global_score: Math.round(globalAvg * 10) / 10,
+          wants_consultant_rdv: false,
+        } as any)
+        .select("id")
+        .single();
 
       if (data) diagnosticIdRef.current = (data as any).id;
     };
@@ -89,31 +120,28 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
   const handleRdvChange = async (checked: boolean) => {
     setWantsRdv(checked);
     if (diagnosticIdRef.current) {
-      await supabase.from('diagnostics')
+      await supabase
+        .from("diagnostics")
         .update({ wants_consultant_rdv: checked } as any)
-        .eq('id', diagnosticIdRef.current);
+        .eq("id", diagnosticIdRef.current);
     }
   };
 
   const radarData = categoryScores.map((c) => ({
-    subject: c.emoji + ' ' + c.category,
+    subject: c.emoji + " " + c.category,
     score: c.score,
     fullMark: 10,
   }));
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gradient-hero)' }}>
+    <div className="min-h-screen" style={{ background: "var(--gradient-hero)" }}>
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-3xl md:text-5xl font-heading font-bold mb-2">
-            Résultats du diagnostic
-          </h1>
-          {companyName && (
-            <p className="text-lg text-primary font-medium mb-4">{companyName}</p>
-          )}
+          <h1 className="text-3xl md:text-5xl font-heading font-bold mb-2">Résultats du diagnostic</h1>
+          {companyName && <p className="text-lg text-primary font-medium mb-4">{companyName}</p>}
           <p className="text-muted-foreground text-lg">
-            Score global :{' '}
+            Score global :{" "}
             <span className="font-bold text-2xl" style={{ color: getScoreColor(globalAvg) }}>
               {globalAvg.toFixed(1)}
             </span>
@@ -123,7 +151,10 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
 
         {/* Urgent zones alert */}
         {urgentZones.length > 0 && (
-          <div className="glass-card p-6 mb-8 border-score-critical/30 animate-fade-in" style={{ borderColor: 'hsl(0, 72%, 51%, 0.3)' }}>
+          <div
+            className="glass-card p-6 mb-8 border-score-critical/30 animate-fade-in"
+            style={{ borderColor: "hsl(0, 72%, 51%, 0.3)" }}
+          >
             <div className="flex items-center gap-3 mb-4">
               <AlertTriangle className="w-6 h-6 text-score-critical" />
               <h2 className="text-lg font-heading font-semibold text-score-critical">
@@ -132,7 +163,10 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
             </div>
             <div className="flex flex-wrap gap-2">
               {urgentZones.map((z) => (
-                <span key={z.categoryId} className="px-3 py-1.5 rounded-full bg-score-critical/10 text-score-critical text-sm font-medium border border-score-critical/20">
+                <span
+                  key={z.categoryId}
+                  className="px-3 py-1.5 rounded-full bg-score-critical/10 text-score-critical text-sm font-medium border border-score-critical/20"
+                >
                   {z.emoji} {z.category} — {z.score}/10
                 </span>
               ))}
@@ -148,8 +182,8 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
             <ResponsiveContainer width="100%" height={350}>
               <RadarChart data={radarData}>
                 <PolarGrid stroke="hsl(222, 30%, 18%)" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: 'hsl(210, 40%, 70%)', fontSize: 11 }} />
-                <PolarRadiusAxis angle={90} domain={[0, 10]} tick={{ fill: 'hsl(215, 20%, 55%)', fontSize: 10 }} />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: "hsl(210, 40%, 70%)", fontSize: 11 }} />
+                <PolarRadiusAxis angle={90} domain={[0, 10]} tick={{ fill: "hsl(215, 20%, 55%)", fontSize: 10 }} />
                 <Radar
                   name="Score"
                   dataKey="score"
@@ -168,13 +202,18 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
             <ResponsiveContainer width="100%" height={350}>
               <BarChart data={categoryScores} layout="vertical" margin={{ left: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 30%, 18%)" />
-                <XAxis type="number" domain={[0, 10]} tick={{ fill: 'hsl(215, 20%, 55%)', fontSize: 11 }} />
+                <XAxis type="number" domain={[0, 10]} tick={{ fill: "hsl(215, 20%, 55%)", fontSize: 11 }} />
                 <YAxis type="category" dataKey="emoji" tick={{ fontSize: 16 }} width={30} />
                 <Tooltip
-                  contentStyle={{ background: 'hsl(222, 47%, 9%)', border: '1px solid hsl(222, 30%, 18%)', borderRadius: 8, color: 'hsl(210, 40%, 96%)' }}
-                  formatter={(value: number) => [value.toFixed(1) + '/10', 'Score']}
+                  contentStyle={{
+                    background: "hsl(222, 47%, 9%)",
+                    border: "1px solid hsl(222, 30%, 18%)",
+                    borderRadius: 8,
+                    color: "hsl(210, 40%, 96%)",
+                  }}
+                  formatter={(value: number) => [value.toFixed(1) + "/10", "Score"]}
                   labelFormatter={(label) => {
-                    const cat = categoryScores.find(c => c.emoji === label);
+                    const cat = categoryScores.find((c) => c.emoji === label);
                     return cat ? cat.category : label;
                   }}
                 />
@@ -196,7 +235,10 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
               <div key={cat.categoryId} className="glass-card p-5 animate-fade-in">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: getScoreColor(cat.score) + '20' }}>
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center"
+                      style={{ background: getScoreColor(cat.score) + "20" }}
+                    >
                       <Icon className="w-5 h-5" style={{ color: getScoreColor(cat.score) }} />
                     </div>
                     <div>
@@ -213,17 +255,22 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
 
                 {/* Text answers summary */}
                 <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {cat.answers.filter(a => a.text.trim()).map((a) => {
-                    const q = cat.questions.find(q => q.id === a.questionId);
-                    return (
-                      <div key={a.questionId} className="text-xs">
-                        <p className="text-muted-foreground">{q?.text}</p>
-                        <p className="text-foreground/80 mt-0.5 pl-2 border-l-2" style={{ borderColor: getScoreColor(a.score) }}>
-                          {a.text}
-                        </p>
-                      </div>
-                    );
-                  })}
+                  {cat.answers
+                    .filter((a) => a.text.trim())
+                    .map((a) => {
+                      const q = cat.questions.find((q) => q.id === a.questionId);
+                      return (
+                        <div key={a.questionId} className="text-xs">
+                          <p className="text-muted-foreground">{q?.text}</p>
+                          <p
+                            className="text-foreground/80 mt-0.5 pl-2 border-l-2"
+                            style={{ borderColor: getScoreColor(a.score) }}
+                          >
+                            {a.text}
+                          </p>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             );
@@ -250,14 +297,18 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
               className="mt-1"
             />
             <label htmlFor="consultant-rdv" className="text-sm text-foreground/90 leading-relaxed cursor-pointer">
-              Souhaitez-vous un rdv avec un de nos Consultants pour avoir un diagnostic approfondi et une présentation de notre logiciel MonAssistant IA ?
+              Souhaitez-vous un rdv avec un de nos Consultants pour avoir un diagnostic approfondi et une présentation
+              de notre logiciel MonAssistant IA ?
             </label>
           </div>
         </div>
 
         <div className="text-center mt-8">
-          <button onClick={onRestart} className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4">
-            Recommencer le diagnostic
+          <button
+            onClick={onRestart}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+          >
+            Terminer le diagnostic
           </button>
         </div>
       </div>
