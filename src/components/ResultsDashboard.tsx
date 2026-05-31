@@ -162,6 +162,14 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
           </p>
         </div>
 
+        {categoryScores.length === 0 && (
+          <div className="glass-card p-6 mb-8 text-center animate-fade-in">
+            <p className="text-muted-foreground">
+              Aucune thématique applicable n'a été identifiée pour ce diagnostic.
+            </p>
+          </div>
+        )}
+
         {/* Urgent zones alert */}
         {urgentZones.length > 0 && (
           <div
