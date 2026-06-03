@@ -1,0 +1,1 @@
+ALTER TABLE public.diagnostics ADD COLUMN IF NOT EXISTS edit_token uuid;
