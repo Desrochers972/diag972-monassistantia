@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Slider } from '@/components/ui/slider';
-import { Textarea } from '@/components/ui/textarea';
-import { ArrowRight, ArrowLeft, Lightbulb } from 'lucide-react';
-import type { Question, Answer } from '@/data/questions';
+import { useState, useEffect } from "react";
+import { Slider } from "@/components/ui/slider";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowRight, ArrowLeft, Lightbulb } from "lucide-react";
+import type { Question, Answer } from "@/data/questions";
 
 interface QuestionCardProps {
   question: Question;
@@ -19,23 +19,23 @@ interface QuestionCardProps {
 }
 
 const scoreLabels: Record<number, string> = {
-  0: 'Non concerné',
-  1: 'Critique',
-  2: 'Très faible',
-  3: 'Faible',
-  4: 'Insuffisant',
-  5: 'Moyen',
-  6: 'Correct',
-  7: 'Bon',
-  8: 'Très bon',
-  9: 'Excellent',
-  10: 'Solution en place',
+  0: "Non concerné",
+  1: "Critique",
+  2: "Très faible",
+  3: "Faible",
+  4: "Insuffisant",
+  5: "Moyen",
+  6: "Correct",
+  7: "Bon",
+  8: "Très bon",
+  9: "Excellent",
+  10: "Solution en place",
 };
 
 const getScoreColor = (score: number) => {
-  if (score <= 3) return 'text-score-critical';
-  if (score <= 7) return 'text-score-warning';
-  return 'text-score-good';
+  if (score <= 3) return "text-score-critical";
+  if (score <= 7) return "text-score-warning";
+  return "text-score-good";
 };
 
 const QuestionCard = ({
@@ -51,11 +51,11 @@ const QuestionCard = ({
   onBack,
   isFirst,
 }: QuestionCardProps) => {
-  const [text, setText] = useState(existingAnswer?.text || '');
+  const [text, setText] = useState(existingAnswer?.text || "");
   const [score, setScore] = useState(existingAnswer?.score ?? 5);
 
   useEffect(() => {
-    setText(existingAnswer?.text || '');
+    setText(existingAnswer?.text || "");
     setScore(existingAnswer?.score ?? 5);
   }, [question.id, existingAnswer]);
 
@@ -66,7 +66,7 @@ const QuestionCard = ({
   const progress = ((globalIndex + 1) / globalTotal) * 100;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'var(--gradient-hero)' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: "var(--gradient-hero)" }}>
       {/* Progress bar */}
       <div className="w-full h-1 bg-secondary">
         <div
@@ -77,7 +77,8 @@ const QuestionCard = ({
 
       <div className="flex-1 flex flex-col items-center px-4 py-8">
         <p className="max-w-2xl w-full text-center font-bold italic text-yellow-400 mb-6">
-          Pour chaque question répondez avec vos propres mots et donnez une évaluation sur 10 de la situation de votre entreprise par rapport à la question.
+          Pour chaque question répondez librement et donnez une évaluation sur 10 de la situation de votre entreprise
+          par rapport à la question.
         </p>
         <div className="max-w-2xl w-full animate-fade-in flex-1 flex flex-col justify-center">
           {/* Category badge */}
@@ -85,7 +86,9 @@ const QuestionCard = ({
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary border border-border">
               <span>{categoryEmoji}</span>
               <span className="text-sm font-medium text-foreground">{categoryName}</span>
-              <span className="text-xs text-muted-foreground">({questionIndex + 1}/{totalQuestions})</span>
+              <span className="text-xs text-muted-foreground">
+                ({questionIndex + 1}/{totalQuestions})
+              </span>
             </div>
             <span className="text-xs text-muted-foreground">
               Question {globalIndex + 1} / {globalTotal}
@@ -95,12 +98,10 @@ const QuestionCard = ({
           {/* Question */}
           <div className="glass-card p-8 mb-6">
             <div className="flex items-start gap-3 mb-6">
-              {question.type === 'revealing' && (
+              {question.type === "revealing" && (
                 <Lightbulb className="w-5 h-5 text-score-warning mt-0.5 flex-shrink-0" />
               )}
-              <h2 className="text-xl md:text-2xl font-heading font-semibold leading-relaxed">
-                {question.text}
-              </h2>
+              <h2 className="text-xl md:text-2xl font-heading font-semibold leading-relaxed">{question.text}</h2>
             </div>
 
             {/* Text response */}
@@ -116,9 +117,7 @@ const QuestionCard = ({
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Évaluez votre situation</span>
                 <div className="flex items-center gap-2">
-                  <span className={`text-2xl font-heading font-bold ${getScoreColor(score)}`}>
-                    {score}
-                  </span>
+                  <span className={`text-2xl font-heading font-bold ${getScoreColor(score)}`}>{score}</span>
                   <span className="text-xs text-muted-foreground">/10</span>
                 </div>
               </div>
@@ -140,9 +139,7 @@ const QuestionCard = ({
                 <span>Solution en place</span>
               </div>
 
-              <p className={`text-sm font-medium text-center ${getScoreColor(score)}`}>
-                {scoreLabels[score]}
-              </p>
+              <p className={`text-sm font-medium text-center ${getScoreColor(score)}`}>{scoreLabels[score]}</p>
             </div>
           </div>
 
