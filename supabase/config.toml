@@ -1,1 +1,10 @@
 project_id = "pwwnvfmzwqkwakirbmqk"
+
+[functions.save-diagnostic]
+verify_jwt = false
+
+[functions.update-rdv]
+verify_jwt = false
+
+[functions.admin-diagnostics]
+verify_jwt = false
