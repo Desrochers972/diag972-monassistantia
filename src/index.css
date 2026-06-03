@@ -34,6 +34,10 @@
     --input: 222 30% 18%;
     --ring: 217 91% 60%;
 
+    /* Light textarea surface for visibility on dark theme */
+    --textarea: 210 30% 95%;
+    --textarea-foreground: 222 47% 11%;
+
     --radius: 0.75rem;
 
     /* Score colors */

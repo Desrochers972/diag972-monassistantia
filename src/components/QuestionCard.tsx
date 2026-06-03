@@ -109,7 +109,7 @@ const QuestionCard = ({
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Votre réponse..."
-              className="bg-card border-border min-h-[100px] text-foreground placeholder:text-muted-foreground resize-none mb-8"
+              className="bg-[hsl(var(--textarea))] border-border min-h-[100px] text-[hsl(var(--textarea-foreground))] placeholder:text-muted-foreground resize-none mb-8"
             />
 
             {/* Score slider */}

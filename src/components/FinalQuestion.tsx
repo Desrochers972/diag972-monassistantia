@@ -36,7 +36,7 @@ const FinalQuestion = ({ existingAnswer, onSubmit, onBack }: FinalQuestionProps)
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Décrivez le problème qui, une fois résolu, changerait tout..."
-              className="bg-card border-border min-h-[150px] text-foreground placeholder:text-muted-foreground resize-none mb-8 text-left"
+              className="bg-[hsl(var(--textarea))] border-border min-h-[150px] text-[hsl(var(--textarea-foreground))] placeholder:text-muted-foreground resize-none mb-8 text-left"
             />
 
             <div className="flex justify-between">
