@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Lock, ArrowLeft, CheckCircle, XCircle, Calendar, Building2, Mail } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { useNavigate } from 'react-router-dom';
 
-const ADMIN_PASSWORD = 'diag972admin';
+
 
 interface DiagnosticRow {
   id: string;
@@ -33,29 +33,24 @@ const Admin = () => {
   const [diagnostics, setDiagnostics] = useState<DiagnosticRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedDiag, setSelectedDiag] = useState<DiagnosticRow | null>(null);
+  const passwordRef = useRef<string>('');
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (password === ADMIN_PASSWORD) {
-      setAuthenticated(true);
-      setError('');
-    } else {
-      setError('Mot de passe incorrect');
-    }
-  };
-
-  useEffect(() => {
-    if (!authenticated) return;
+  const handleLogin = async () => {
+    setError('');
     setLoading(true);
-    supabase
-      .from('diagnostics')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .then(({ data }) => {
-        setDiagnostics((data as DiagnosticRow[]) || []);
-        setLoading(false);
-      });
-  }, [authenticated]);
+    const { data, error: fnError } = await supabase.functions.invoke('admin-diagnostics', {
+      headers: { 'x-admin-password': password },
+    });
+    setLoading(false);
+    if (fnError || !data?.diagnostics) {
+      setError('Mot de passe incorrect');
+      return;
+    }
+    passwordRef.current = password;
+    setDiagnostics(data.diagnostics as DiagnosticRow[]);
+    setAuthenticated(true);
+  };
 
   if (!authenticated) {
     return (
