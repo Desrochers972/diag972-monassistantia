@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Lock, ArrowLeft, CheckCircle, XCircle, Calendar, Building2, Mail } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { useNavigate } from 'react-router-dom';
 
-const ADMIN_PASSWORD = 'diag972admin';
+
 
 interface DiagnosticRow {
   id: string;
