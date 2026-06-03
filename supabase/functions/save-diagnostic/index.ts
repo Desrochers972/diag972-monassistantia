@@ -10,7 +10,22 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const body = await req.json();
+    // Guard against oversized payloads (256 KB)
+    const contentLength = Number(req.headers.get("content-length") ?? "0");
+    if (contentLength > 256 * 1024) {
+      return new Response(JSON.stringify({ error: "Payload too large" }), {
+        status: 413,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const rawText = await req.text();
+    if (rawText.length > 256 * 1024) {
+      return new Response(JSON.stringify({ error: "Payload too large" }), {
+        status: 413,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const body = JSON.parse(rawText);
     const {
       user_email,
       company_name,
@@ -20,24 +35,36 @@ Deno.serve(async (req) => {
       global_score,
     } = body ?? {};
 
-    // Minimal validation
-    if (!Array.isArray(answers) || !Array.isArray(category_scores) || typeof global_score !== "number") {
-      return new Response(JSON.stringify({ error: "Invalid payload" }), {
+    const bad = (msg: string) =>
+      new Response(JSON.stringify({ error: msg }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+
+    if (!Array.isArray(answers) || !Array.isArray(category_scores) || typeof global_score !== "number") {
+      return bad("Invalid payload");
+    }
+    if (answers.length > 100 || category_scores.length > 100) {
+      return bad("Too many items");
+    }
+    for (const a of answers) {
+      if (a && typeof a === "object" && typeof (a as any).text === "string" && (a as any).text.length > 1000) {
+        return bad("Answer text too long");
+      }
+    }
+    if (!Number.isFinite(global_score) || global_score < 0 || global_score > 10) {
+      return bad("Invalid global_score");
+    }
+    if (final_answer != null) {
+      if (typeof final_answer !== "string" || final_answer.length > 2000) {
+        return bad("Invalid final_answer");
+      }
     }
     if (user_email && (typeof user_email !== "string" || user_email.length > 320)) {
-      return new Response(JSON.stringify({ error: "Invalid email" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return bad("Invalid email");
     }
     if (company_name && (typeof company_name !== "string" || company_name.length > 200)) {
-      return new Response(JSON.stringify({ error: "Invalid company" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return bad("Invalid company");
     }
 
     const supabase = createClient(
