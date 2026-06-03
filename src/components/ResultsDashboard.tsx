@@ -99,6 +99,7 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
 
   // Save diagnostic to database on mount
   const savedRef = useRef(false);
+  const editTokenRef = useRef<string | null>(null);
   useEffect(() => {
     if (savedRef.current) return;
     savedRef.current = true;
@@ -110,21 +111,21 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
         score: c.score,
       }));
 
-      const { data } = await supabase
-        .from("diagnostics")
-        .insert({
+      const { data, error } = await supabase.functions.invoke("save-diagnostic", {
+        body: {
           user_email: userEmail || null,
           company_name: companyName || null,
-          answers: answers as any,
+          answers,
           final_answer: finalAnswer || null,
-          category_scores: scoresSummary as any,
+          category_scores: scoresSummary,
           global_score: Math.round(globalAvg * 10) / 10,
-          wants_consultant_rdv: false,
-        } as any)
-        .select("id")
-        .single();
+        },
+      });
 
-      if (data) diagnosticIdRef.current = (data as any).id;
+      if (!error && data?.id) {
+        diagnosticIdRef.current = data.id;
+        editTokenRef.current = data.edit_token;
+      }
     };
 
     saveDiagnostic();
@@ -132,11 +133,14 @@ const ResultsDashboard = ({ answers, finalAnswer, userEmail, companyName, onRest
 
   const handleRdvChange = async (checked: boolean) => {
     setWantsRdv(checked);
-    if (diagnosticIdRef.current) {
-      await supabase
-        .from("diagnostics")
-        .update({ wants_consultant_rdv: checked } as any)
-        .eq("id", diagnosticIdRef.current);
+    if (diagnosticIdRef.current && editTokenRef.current) {
+      await supabase.functions.invoke("update-rdv", {
+        body: {
+          id: diagnosticIdRef.current,
+          edit_token: editTokenRef.current,
+          wants_consultant_rdv: checked,
+        },
+      });
     }
   };
 
